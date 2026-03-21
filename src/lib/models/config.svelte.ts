@@ -11,6 +11,7 @@ export type ConfigKey =
     | 'welcome-agreed'
     | 'skipped-version'
     | 'default-model'
+    | 'default-context-window'
     | 'null';
 
 export default class Config extends Base<Row>('config') {
@@ -29,6 +30,9 @@ export default class Config extends Base<Row>('config') {
 
     @getset('default-model')
     static defaultModel: string;
+
+    @getset('default-context-window')
+    static defaultContextWindow: number;
 
     protected static async fromSql(row: Row): Promise<Config> {
         return Config.new({
