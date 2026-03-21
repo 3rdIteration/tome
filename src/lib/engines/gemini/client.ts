@@ -33,6 +33,7 @@ export default class Gemini implements Client {
 
         const config: GenerateContentConfig = {
             temperature: options?.temperature,
+            thinkingConfig: { includeThoughts: true },
         };
 
         // Add system instruction if system messages exist
@@ -48,11 +49,13 @@ export default class Gemini implements Client {
             config.tools = GeminiTools.from(tools);
         }
 
-        const { text, functionCalls } = await this.client.models.generateContent({
+        const response = await this.client.models.generateContent({
             model: model.name,
             contents: messages,
             config,
         });
+
+        const { text, functionCalls } = response;
 
         let toolCalls: ToolCall[] = [];
 
@@ -65,11 +68,24 @@ export default class Gemini implements Client {
             }));
         }
 
+        // Extract thought parts from the response
+        let thought: string | undefined;
+        const parts = response.candidates?.[0]?.content?.parts;
+        if (parts) {
+            const thoughtTexts = parts
+                .filter((p): p is typeof p & { text: string } => p.thought === true && typeof p.text === 'string')
+                .map(p => p.text);
+            if (thoughtTexts.length > 0) {
+                thought = thoughtTexts.join('\n');
+            }
+        }
+
         return Message.new({
             model: model.name,
             name: '',
             role: 'assistant',
             content: text || '',
+            thought,
             toolCalls,
         });
     }
