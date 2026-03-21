@@ -15,6 +15,7 @@
     import Titlebar from '$components/Titlebar.svelte';
     import Toggle from '$components/Toggle.svelte';
     import * as color from '$lib/colorscheme';
+    import Config from '$lib/models/config.svelte';
     import Engine from '$lib/models/engine.svelte';
     import Setting from '$lib/models/setting.svelte';
 
@@ -23,12 +24,17 @@
     let adding = $state(false);
     let saving = $state(false);
     let scheme: color.ColorScheme = $state(Setting.ColorScheme ?? 'system');
+    let defaultContextWindow: number = $state(Config.defaultContextWindow ?? 4096);
 
     // Color scheme state
 
     function onColorSchemeChange() {
         Setting.ColorScheme = scheme;
         color.apply(scheme);
+    }
+
+    function onDefaultContextWindowChange() {
+        Config.defaultContextWindow = defaultContextWindow;
     }
 
     async function ondelete(engine: Engine) {
@@ -134,6 +140,27 @@
 
                 <Flex class="w-full flex-col items-start">
                     <CustomPromptView bind:saving />
+                </Flex>
+            </Flex>
+
+            <Flex class="w-full items-start gap-4">
+                <section class="w-2/5">
+                    <h2 class="font-semibold uppercase">Default Context Window</h2>
+                    <p class="text-medium font-light">
+                        Set the default context window size for new conversations. This controls how
+                        many tokens the LLM can consider when generating a response.
+                    </p>
+                </section>
+
+                <Flex class="w-full flex-col items-start">
+                    <input
+                        name="default_ctx_window"
+                        type="number"
+                        autocomplete="off"
+                        class="border-light w-full rounded-lg border px-4 py-1 outline-none"
+                        oninput={onDefaultContextWindowChange}
+                        bind:value={defaultContextWindow}
+                    />
                 </Flex>
             </Flex>
 
