@@ -2,7 +2,7 @@
     "bundle": {
         "createUpdaterArtifacts": false,
         "windows": {
-            "signCommand": ""
+            "signCommand": null
         }
     }
 }
