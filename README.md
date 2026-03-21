@@ -68,6 +68,48 @@ https://github.com/user-attachments/assets/0775d100-3eba-4219-9e2f-360a01f28cce
 3. Open the MCP tab in Tome and install your first [MCP server](https://github.com/modelcontextprotocol/servers) (Fetch is an easy one to get started with, just paste `uvx mcp-server-fetch` into the server field).
 4. Chat with your MCP-powered model! Ask it to fetch the top story on Hacker News.
 
+## Building from Source
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- [pnpm](https://pnpm.io/) package manager
+- [Rust](https://www.rust-lang.org/tools/install) 1.85 or later
+- Tauri 2 system dependencies — see the [Tauri prerequisites guide](https://v2.tauri.app/start/prerequisites/) for your platform
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/runebookai/tome.git
+cd tome
+
+# Install frontend dependencies
+pnpm install
+```
+
+### Development
+
+Run Tome in development mode with hot-reload:
+
+```bash
+pnpm tauri dev
+```
+
+This starts the Vite dev server for the frontend and compiles/runs the Rust backend. Changes to the frontend will hot-reload automatically; changes to the Rust backend will trigger a recompile.
+
+### Production Build
+
+Build a release binary for your platform:
+
+```bash
+pnpm tauri build
+```
+
+The built application will be available in `src-tauri/target/release`.
+
+For more details on the architecture, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 # Vision
 
 We want to make local LLMs and MCP accessible to everyone. We're building a tool that allows you to be creative with LLMs, regardless
