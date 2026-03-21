@@ -6,6 +6,7 @@ import type { Tool } from '$lib/engines/types';
 import { getMcpTools } from '$lib/mcp';
 import { App, McpServer, Message, Model, Setting } from '$lib/models';
 import Base, { type ToSqlRow } from '$lib/models/base.svelte';
+import Config from '$lib/models/config.svelte';
 import { DEFAULT_SUMMARY } from '$lib/summarize';
 
 /**
@@ -54,7 +55,7 @@ export default class Session extends Base<Row>('sessions') {
             config: {
                 model: model?.id,
                 engineId: model?.engineId,
-                contextWindow: 4096,
+                contextWindow: Config.defaultContextWindow ?? 4096,
                 temperature: 0.8,
             },
         };
