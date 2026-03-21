@@ -1,0 +1,43 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            args: '--target aarch64-apple-darwin'
+          - os: windows-latest
+            args: ''
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
+
+      - name: pnpm
+        run: npm install -g pnpm
+
+      - name: dependencies
+        run: pnpm install
+
+      - uses: tauri-apps/tauri-action@v0
+        with:
+          args: ${{ matrix.args }}
