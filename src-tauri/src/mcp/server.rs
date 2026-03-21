@@ -17,7 +17,7 @@ type Service = RunningService<RoleClient, ()>;
 #[derive(Debug)]
 pub struct McpServer {
     service: Service,
-    pid: Pid,
+    pid: Option<Pid>,
     custom_name: Option<String>,
 }
 
@@ -76,8 +76,11 @@ impl McpServer {
     }
 
     pub fn kill(&self) -> Result<bool> {
-        match Process::find(self.pid) {
-            Some(p) => p.kill(),
+        match self.pid {
+            Some(pid) => match Process::find(pid) {
+                Some(p) => p.kill(),
+                None => Ok(false),
+            },
             None => Ok(false),
         }
     }

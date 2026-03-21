@@ -9,11 +9,13 @@ use crate::APP_HANDLE;
 // No "//" after the scheme and no query param key. Thanks Microsoft.
 //
 pub fn mcp_install(query: &str) {
-    APP_HANDLE
-        .get()
-        .unwrap()
-        .emit("mcp/install", query)
-        .unwrap();
+    if let Some(handle) = APP_HANDLE.get() {
+        if let Err(e) = handle.emit("mcp/install", query) {
+            log::error!("Failed to emit mcp/install event: {}", e);
+        }
+    } else {
+        log::error!("App handle not available for mcp/install deep link");
+    }
 }
 
 // Import deeplinks resemble:
@@ -21,11 +23,13 @@ pub fn mcp_install(query: &str) {
 // `tome://apps/import?app=<url-encoded-json>`
 //
 pub fn import_app(query: &str) {
-    APP_HANDLE
-        .get()
-        .unwrap()
-        .emit("apps/import", query)
-        .unwrap();
+    if let Some(handle) = APP_HANDLE.get() {
+        if let Err(e) = handle.emit("apps/import", query) {
+            log::error!("Failed to emit apps/import event: {}", e);
+        }
+    } else {
+        log::error!("App handle not available for apps/import deep link");
+    }
 }
 
 pub fn handle(urls: Vec<Url>) {
@@ -44,7 +48,13 @@ pub fn handle(urls: Vec<Url>) {
     // explcitly since the Smithery version causes the `URL` lib to act differently.
     //
     if url.to_string().contains("tome://") {
-        action = format!("{}{}", url.domain().unwrap(), url.path());
+        action = match url.domain() {
+            Some(domain) => format!("{}{}", domain, url.path()),
+            None => {
+                log::warn!("Deep link URL has no domain: {}", url);
+                return;
+            }
+        };
     } else {
         action = url.path().to_string();
     };
