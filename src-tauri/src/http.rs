@@ -52,10 +52,11 @@ pub async fn fetch(url: String, options: ProxyOptions) -> Result<HTTPResponse, S
 
     if let Some(h) = options.headers {
         for (k, v) in h.iter() {
-            headers.insert(
-                HeaderName::from_bytes(k.as_bytes()).unwrap(),
-                HeaderValue::from_bytes(v.as_bytes()).unwrap(),
-            );
+            let name = HeaderName::from_bytes(k.as_bytes())
+                .map_err(|e| format!("Invalid header name '{}': {}", k, e))?;
+            let value = HeaderValue::from_bytes(v.as_bytes())
+                .map_err(|e| format!("Invalid header value for '{}': {}", k, e))?;
+            headers.insert(name, value);
         }
     }
 
