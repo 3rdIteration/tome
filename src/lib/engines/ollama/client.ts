@@ -55,6 +55,8 @@ export default class Ollama implements Client {
             content,
             thought,
             toolCalls: response.message.tool_calls || [],
+            promptTokens: response.prompt_eval_count ?? undefined,
+            completionTokens: response.eval_count ?? undefined,
         });
     }
 

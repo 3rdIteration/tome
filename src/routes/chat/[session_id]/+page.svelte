@@ -32,6 +32,19 @@
     const engines: Engine[] = $derived(Engine.all());
     const hasModels = $derived(engines.flatMap(e => e.models).length > 0);
 
+    const lastAssistantMessage: Message | undefined = $derived(
+        session?.messages
+            ?.filter(m => m.role === 'assistant' && m.promptTokens != null)
+            .at(-1)
+    );
+    const contextWindow = $derived(session?.config?.contextWindow ?? 4096);
+    const promptTokens = $derived(lastAssistantMessage?.promptTokens ?? 0);
+    const completionTokens = $derived(lastAssistantMessage?.completionTokens ?? 0);
+    const totalTokens = $derived(promptTokens + completionTokens);
+    const usagePercent = $derived(
+        contextWindow > 0 ? Math.min(Math.round((totalTokens / contextWindow) * 100), 100) : 0
+    );
+
     let advancedIsOpen = $state(false);
 
     async function modelDidUpdate(model: Model) {
@@ -180,6 +193,25 @@
                     <Flex class="text-red w-full justify-start gap-2 pl-3">
                         <Svg class="h-6 w-6" name="Warning" />
                         Model doesn't support MCP
+                    </Flex>
+                {/if}
+
+                {#if lastAssistantMessage}
+                    <Flex class="mt-4 w-full flex-col items-start px-2">
+                        <Flex class="text-medium mb-1 w-full justify-between text-xs">
+                            <span>Context Window</span>
+                            <span>{totalTokens.toLocaleString()} / {contextWindow.toLocaleString()} tokens</span>
+                        </Flex>
+                        <div class="bg-light h-2 w-full rounded-full">
+                            <div
+                                class="h-2 rounded-full transition-all duration-300 {usagePercent >= 90 ? 'bg-red' : usagePercent >= 70 ? 'bg-yellow' : 'bg-purple'}"
+                                style="width: {usagePercent}%"
+                            ></div>
+                        </div>
+                        <Flex class="text-light mt-1 w-full justify-between text-xs">
+                            <span>{usagePercent}% used</span>
+                            <span>{promptTokens.toLocaleString()} in / {completionTokens.toLocaleString()} out</span>
+                        </Flex>
                     </Flex>
                 {/if}
 

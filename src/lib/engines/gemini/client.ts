@@ -87,6 +87,8 @@ export default class Gemini implements Client {
             content: text || '',
             thought,
             toolCalls,
+            promptTokens: response.usageMetadata?.promptTokenCount ?? undefined,
+            completionTokens: response.usageMetadata?.candidatesTokenCount ?? undefined,
         });
     }
 

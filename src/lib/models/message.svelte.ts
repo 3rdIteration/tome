@@ -16,6 +16,8 @@ interface Row {
     thought?: string;
     name: string;
     tool_calls: string;
+    prompt_tokens?: number;
+    completion_tokens?: number;
     created: string;
     modified: string;
 }
@@ -31,6 +33,8 @@ export default class Message extends Base<Row>('messages') {
     thought?: string = $state();
     name: string = $state('');
     toolCalls: ToolCall[] = $state([]);
+    promptTokens?: number = $state();
+    completionTokens?: number = $state();
     created?: moment.Moment = $state();
     modified?: moment.Moment = $state();
 
@@ -59,6 +63,8 @@ export default class Message extends Base<Row>('messages') {
             thought: row.thought,
             name: row.name,
             toolCalls: JSON.parse(row.tool_calls),
+            promptTokens: row.prompt_tokens ?? undefined,
+            completionTokens: row.completion_tokens ?? undefined,
             created: moment.utc(row.created),
             modified: moment.utc(row.modified),
         });
@@ -75,6 +81,8 @@ export default class Message extends Base<Row>('messages') {
             thought: this.thought,
             name: this.name,
             tool_calls: JSON.stringify(this.toolCalls),
+            prompt_tokens: this.promptTokens,
+            completion_tokens: this.completionTokens,
         };
     }
 }
