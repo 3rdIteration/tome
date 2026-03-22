@@ -66,6 +66,8 @@ export default class OpenAI implements Client {
             content: content || '',
             thought,
             toolCalls,
+            promptTokens: response.usage?.prompt_tokens ?? undefined,
+            completionTokens: response.usage?.completion_tokens ?? undefined,
         });
     }
 

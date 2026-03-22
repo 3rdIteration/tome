@@ -551,5 +551,14 @@ UPDATE sessions SET config = json_remove(config, '$.enabledMcpServers');
 "#,
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 21,
+            description: "add_message_token_usage",
+            sql: r#"
+ALTER TABLE messages ADD COLUMN prompt_tokens INTEGER;
+ALTER TABLE messages ADD COLUMN completion_tokens INTEGER;
+"#,
+            kind: MigrationKind::Up,
+        },
     ]
 }
