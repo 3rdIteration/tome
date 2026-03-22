@@ -13,6 +13,7 @@
     import Svg from '$components/Svg.svelte';
     import Toggle from '$components/Toggle.svelte';
     import { App } from '$lib/models';
+    import Config from '$lib/models/config.svelte';
     import Engine from '$lib/models/engine.svelte';
     import McpServer from '$lib/models/mcp-server.svelte';
     import Message from '$lib/models/message.svelte';
@@ -34,10 +35,10 @@
 
     const lastAssistantMessage: Message | undefined = $derived(
         session?.messages
-            ?.filter(m => m.role === 'assistant' && m.promptTokens != null)
+            ?.filter(m => m.role === 'assistant' && m.promptTokens != null && m.completionTokens != null)
             .at(-1)
     );
-    const contextWindow = $derived(session?.config?.contextWindow ?? 4096);
+    const contextWindow = $derived(session?.config?.contextWindow ?? Config.defaultContextWindow ?? 4096);
     const promptTokens = $derived(lastAssistantMessage?.promptTokens ?? 0);
     const completionTokens = $derived(lastAssistantMessage?.completionTokens ?? 0);
     const totalTokens = $derived(promptTokens + completionTokens);
