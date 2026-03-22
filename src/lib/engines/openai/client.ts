@@ -39,7 +39,8 @@ export default class OpenAI implements Client {
         }
 
         const response = await this.client.chat.completions.create(completion);
-        const { role, content, tool_calls } = response.choices[0].message;
+        const message = response.choices[0].message;
+        const { role, content, tool_calls } = message;
 
         let toolCalls: ToolCall[] = [];
 
@@ -52,11 +53,18 @@ export default class OpenAI implements Client {
             }));
         }
 
+        // Extract reasoning content from OpenAI-compatible providers (e.g. DeepSeek)
+        const reasoningContent = (message as unknown as Record<string, unknown>)
+            .reasoning_content;
+        const thought =
+            typeof reasoningContent === 'string' && reasoningContent ? reasoningContent : undefined;
+
         return Message.new({
             model: model.name,
             name: '',
             role,
             content: content || '',
+            thought,
             toolCalls,
         });
     }

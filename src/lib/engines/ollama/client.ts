@@ -36,13 +36,14 @@ export default class Ollama implements Client {
             stream: false,
         });
 
-        let thought: string | undefined;
+        // Use native thinking field from SDK, with fallback to <think> tag parsing
+        let thought: string | undefined = response.message.thinking;
         let content: string = response.message.content
             .replace(/\.$/, '')
             .replace(/^"/, '')
             .replace(/"$/, '');
 
-        if (content.includes('<think>')) {
+        if (!thought && content.includes('<think>')) {
             [thought, content] = content.split('</think>');
             thought = thought.replace('<think>', '').trim();
             content = content.trim();
